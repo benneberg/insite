@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteRight</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: var(--surface);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .settings-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .settings-btn:hover {
+            background: var(--border);
+            transform: rotate(90deg);
+        }
+
+        .settings-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .settings-panel {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .settings-panel.active {
+            max-height: 1000px;
+            opacity: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .slider-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .slider-label span {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .slider-value {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.1);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mode-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-selector select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--surface);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mode-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .explanation-box {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .explanation-box p {
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .explanation-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .explanation-box li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .explanation-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0.5rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .action-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 0.625rem 0.875rem;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            border-radius: 0.5rem;
+            font-size: 0.813rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .result-box {
+            background: var(--bg);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--success);
+            max-height: 400px;
+            overflow-y: auto;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .result-box.error {
+            border-left-color: var(--danger);
+        }
+
+        .result-box.warning {
+            border-left-color: var(--warning);
+        }
+
+        .result-box h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .result-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .url-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .url-input-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .url-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-label {
+            font-size: 0.813rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-top: 0.75rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+
+        .status-indicator.connected {
+            background: var(--success);
+        }
+
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 0.75rem;
+            min-height: 200px;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .chat-message-content {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .chat-message-content {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .chat-message.assistant .chat-message-content {
+            background: var(--surface);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-bottom-left-radius: 0.25rem;
+            text-align: left;
+        }
+
+        .chat-message-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input-group input {
+            flex: 1;
+            padding: 0.875rem;
+            border: 2px solid var(--border);
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .chat-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .chat-send-btn {
+            width: 3rem;
+            height: 3rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .language-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .chat-info {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .tab-btn {
+                min-width: 90px;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">SiteRight</div>
+            <button class="settings-btn" id="settingsBtn" aria-label="Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m8.66-13.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m18.36 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <h2 class="section-title">⚙️ Settings</h2>
+            
+            <div class="api-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">API Key not configured</span>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKey">Groq API Key</label>
+                <input type="password" id="apiKey" placeholder="Enter your Groq API key">
+            </div>
+
+            <div class="form-group">
+                <label for="modelSelect">Model</label>
+                <select id="modelSelect">
+                    <option value="">Select a model</option>
+                </select>
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Temperature</span>
+                    <span class="slider-value" id="tempValue">0.7</span>
+                </div>
+                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Max Tokens</span>
+                    <span class="slider-value" id="tokensValue">2048</span>
+                </div>
+                <input type="range" id="maxTokens" min="256" max="8192" step="256" value="2048">
+            </div>
+
+            <div class="form-group">
+                <label for="languageSelect">Output Language</label>
+                <select id="languageSelect">
+                    <option value="auto">Auto-detect from website</option>
+                    <option value="sv">Swedish (Svenska)</option>
+                    <option value="en">English</option>
+                    <option value="no">Norwegian (Norsk)</option>
+                    <option value="da">Danish (Dansk)</option>
+                    <option value="de">German (Deutsch)</option>
+                    <option value="es">Spanish (Español)</option>
+                    <option value="fr">French (Français)</option>
+                    <option value="it">Italian (Italiano)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="systemPrompt">System Prompt (Optional)</label>
+                <textarea id="systemPrompt" placeholder="Enter custom system instructions for the AI..."></textarea>
+            </div>
+
+            <button class="btn btn-primary" id="saveSettings">💾 Save Settings</button>
+        </div>
+
+        <div class="card">
+            <div class="mode-selector">
+                <select id="modeSelect">
+                    <option value="seo">SEO Expert</option>
+                    <option value="accessibility">Accessibility Checker</option>
+                    <option value="performance">Performance Analyzer</option>
+                    <option value="security">Security Audit</option>
+                    <option value="css">CSS Optimizer</option>
+                </select>
+            </div>
+
+            <div class="url-input-group">
+                <input type="url" id="urlInput" placeholder="Enter URL to analyze (e.g., https://example.com)">
+            </div>
+
+            <div class="section-title">🎯 Quick Actions</div>
+            <div class="action-tabs" id="actionTabs">
+                <button class="tab-btn active" data-action="general">General</button>
+                <button class="tab-btn" data-action="inspect">Inspect</button>
+                <button class="tab-btn" data-action="clean">Clean CSS</button>
+                <button class="tab-btn" data-action="analyze">Deep Dive</button>
+            </div>
+
+            <div class="explanation-box" id="explanationBox">
+                <p><strong>Select an action to get started:</strong></p>
+                <ul>
+                    <li><strong>General:</strong> High-level overview with priority recommendations</li>
+                    <li><strong>Inspect:</strong> Detailed element-by-element analysis</li>
+                    <li><strong>Clean CSS:</strong> CSS optimization strategies</li>
+                    <li><strong>Deep Dive:</strong> Comprehensive advanced analysis</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" id="runAnalysis">
+                <span>🚀 Run Analysis</span>
+            </button>
+            <button class="btn btn-secondary" id="clearResults">🗑️ Clear Results</button>
+
+            <div id="resultsContainer"></div>
+        </div>
+
+        <div class="card" id="chatCard" style="display: none;">
+            <div class="section-title">💬 Chat with AI Assistant</div>
+            <div class="chat-info">
+                <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Ask follow-up questions about the analysis, get help writing better content, generate alt texts, or request specific improvements.
+                </p>
+            </div>
+            <div class="chat-container" id="chatContainer">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="chatInput" placeholder="Ask about the analysis or request help..." />
+                <button class="chat-send-btn" id="chatSendBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <button class="btn btn-secondary" id="clearChat" style="margin-top: 0.75rem;">🗑️ Clear Chat History</button>
+        </div>
+
+        <div class="card">
+            <div class="section-title">✨ Additional Features</div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="quickAction('meta')">
+                    <div class="feature-icon">🏷️</div>
+                    <div class="feature-label">Meta Tags</div>
+                </div>
+                <div class="feature-card" onclick="quickAction('headers')">
+                    <div class="feature-icon">📑</div>
+                    <div class="feature-label">Headers</div>
+                </div>
+                <div class="feature-card" onclick="quickAction('images')">
+                    <div class="feature-icon">🖼️</div>
+                    <div class="feature-label">Images</div>
+                </div>
+                <div class="feature-card" onclick="quickAction('links')">
+                    <div class="feature-icon">🔗</div>
+                    <div class="feature-label">Links</div>
+                </div>
+                <div class="feature-card" onclick="quickAction('mobile')">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-label">Mobile</div>
+                </div>
+                <div class="feature-card" onclick="quickAction('schema')">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-label">Schema</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // State management
+        const state = {
+            apiKey: '',
+            model: '',
+            temperature: 0.7,
+            maxTokens: 2048,
+            systemPrompt: '',
+            currentMode: 'seo',
+            currentAction: 'general',
+            models: [],
+            websiteInfo: null,
+            chatHistory: [],
+            detectedLanguage: 'en',
+            selectedLanguage: 'auto'
+        };
+
+        // Load settings
+        function loadSettings() {
+            const saved = localStorage.getItem('octoai_settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                state.apiKey = settings.apiKey || '';
+                state.model = settings.model || '';
+                state.temperature = settings.temperature || 0.7;
+                state.maxTokens = settings.maxTokens || 2048;
+                state.systemPrompt = settings.systemPrompt || '';
+                state.selectedLanguage = settings.selectedLanguage || 'auto';
+
+                document.getElementById('apiKey').value = state.apiKey;
+                document.getElementById('temperature').value = state.temperature;
+                document.getElementById('maxTokens').value = state.maxTokens;
+                document.getElementById('systemPrompt').value = state.systemPrompt;
+                document.getElementById('languageSelect').value = state.selectedLanguage;
+                document.getElementById('tempValue').textContent = state.temperature;
+                document.getElementById('tokensValue').textContent = state.maxTokens;
+
+                if (state.apiKey) {
+                    fetchModels();
+                }
+            }
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                apiKey: state.apiKey,
+                model: state.model,
+                temperature: state.temperature,
+                maxTokens: state.maxTokens,
+                systemPrompt: state.systemPrompt,
+                selectedLanguage: state.selectedLanguage
+            };
+            localStorage.setItem('octoai_settings', JSON.stringify(settings));
+            showToast('Settings saved successfully!');
+        }
+
+        // Fetch available models from Groq
+        async function fetchModels() {
+            try {
+                const response = await axios.get('https://api.groq.com/openai/v1/models', {
+                    headers: {
+                        'Authorization': `Bearer ${state.apiKey}`
+                    }
+                });
+
+                state.models = response.data.data;
+                const modelSelect = document.getElementById('modelSelect');
+                modelSelect.innerHTML = '<option value="">Select a model</option>';
+                
+                state.models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model.id;
+                    option.textContent = model.id;
+                    if (model.id === state.model) {
+                        option.selected = true;
+                    }
+                    modelSelect.appendChild(option);
+                });
+
+                updateStatus(true);
+            } catch (error) {
+                console.error('Error fetching models:', error);
+                updateStatus(false);
+                showToast('Failed to fetch models. Check your API key.', 'error');
+            }
+        }
+
+        // Update API status indicator
+        function updateStatus(connected) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                indicator.classList.add('connected');
+                text.textContent = 'API Connected';
+            } else {
+                indicator.classList.remove('connected');
+                text.textContent = state.apiKey ? 'Connection failed' : 'API Key not configured';
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle settings panel
+        document.getElementById('settingsBtn').addEventListener('click', () => {
+            const panel = document.getElementById('settingsPanel');
+            const btn = document.getElementById('settingsBtn');
+            panel.classList.toggle('active');
+            btn.classList.toggle('active');
+        });
+
+        // Handle API key input
+        document.getElementById('apiKey').addEventListener('change', (e) => {
+            state.apiKey = e.target.value;
+            if (state.apiKey) {
+                fetchModels();
+            }
+        });
+
+        // Handle model selection
+        document.getElementById('modelSelect').addEventListener('change', (e) => {
+            state.model = e.target.value;
+        });
+
+        // Handle temperature slider
+        document.getElementById('temperature').addEventListener('input', (e) => {
+            state.temperature = parseFloat(e.target.value);
+            document.getElementById('tempValue').textContent = state.temperature;
+        });
+
+        // Handle max tokens slider
+        document.getElementById('maxTokens').addEventListener('input', (e) => {
+            state.maxTokens = parseInt(e.target.value);
+            document.getElementById('tokensValue').textContent = state.maxTokens;
+        });
+
+        // Handle system prompt
+        document.getElementById('systemPrompt').addEventListener('change', (e) => {
+            state.systemPrompt = e.target.value;
+        });
+
+        // Handle language selection
+        document.getElementById('languageSelect').addEventListener('change', (e) => {
+            state.selectedLanguage = e.target.value;
+        });
+
+        // Save settings button
+        document.getElementById('saveSettings').addEventListener('click', () => {
+            saveSettings();
+        });
+
+        // Mode selection
+        document.getElementById('modeSelect').addEventListener('change', (e) => {
+            state.currentMode = e.target.value;
+            updateExplanation();
+            // Auto-select "General" action when mode changes
+            state.currentAction = 'general';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-action="general"]').classList.add('active');
+        });
+
+        // Action tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                state.currentAction = e.target.dataset.action;
+                updateExplanation();
+            });
+        });
+
+        // Detect language from website content
+        function detectLanguage(websiteInfo) {
+            const content = (websiteInfo.title + ' ' + websiteInfo.metaDescription + ' ' + websiteInfo.bodyText).toLowerCase();
+            
+            // Swedish detection patterns
+            if (content.match(/\b(och|att|för|med|är|som|till|av|på|i|en|ett|det|den|han|hon|har|var|kan|om|inte|de|vi|du|ni|man|blir|skulle|måste|ska|utan|över|under|mycket|efter|mellan|från|hos|än)\b/g)?.length > 10) {
+                return 'sv';
+            }
+            
+            // Norwegian detection
+            if (content.match(/\b(og|at|for|med|er|som|til|av|på|i|en|et|det|den|han|hun|har|var|kan|om|ikke|de|vi|du|dere|blir|skulle|må|skal|uten|over|under|mye|etter|mellom|fra|hos)\b/g)?.length > 10) {
+                return 'no';
+            }
+            
+            return 'en'; // Default to English
+        }
+
+        // Get language instruction for AI
+        function getLanguageInstruction() {
+            if (state.selectedLanguage === 'auto') {
+                const langNames = {
+                    'sv': 'Swedish',
+                    'en': 'English', 
+                    'no': 'Norwegian',
+                    'da': 'Danish',
+                    'de': 'German',
+                    'es': 'Spanish',
+                    'fr': 'French'
+                };
+                return `Respond in ${langNames[state.detectedLanguage] || 'English'} (detected from website content).`;
+            } else {
+                const langNames = {
+                    'sv': 'Swedish',
+                    'en': 'English',
+                    'no': 'Norwegian', 
+                    'da': 'Danish',
+                    'de': 'German',
+                    'es': 'Spanish',
+                    'fr': 'French',
+                    'it': 'Italian'
+                };
+                return `Respond in ${langNames[state.selectedLanguage]}.`;
+            }
+        }
+
+        // Fetch website content
+        async function fetchWebsiteContent(url) {
+            try {
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const response = await axios.get(proxyUrl, {
+                    timeout: 15000
+                });
+                return response.data;
+            } catch (error) {
+                throw new Error(`Failed to fetch website: ${error.message}`);
+            }
+        }
+
+        // Extract relevant information from HTML
+        function extractWebsiteInfo(html, url) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const info = {
+                url: url,
+                title: doc.querySelector('title')?.textContent || 'No title found',
+                metaDescription: doc.querySelector('meta[name="description"]')?.content || 'No meta description',
+                h1Tags: Array.from(doc.querySelectorAll('h1')).map(h => h.textContent.trim()).slice(0, 5),
+                h2Tags: Array.from(doc.querySelectorAll('h2')).map(h => h.textContent.trim()).slice(0, 10),
+                images: Array.from(doc.querySelectorAll('img')).slice(0, 20).map(img => ({
+                    src: img.src,
+                    alt: img.alt || 'No alt text'
+                })),
+                links: Array.from(doc.querySelectorAll('a[href]')).slice(0, 30).map(a => ({
+                    href: a.href,
+                    text: a.textContent.trim()
+                })),
+                metaTags: Array.from(doc.querySelectorAll('meta')).map(meta => ({
+                    name: meta.name || meta.property,
+                    content: meta.content
+                })).filter(m => m.name),
+                scripts: Array.from(doc.querySelectorAll('script[src]')).map(s => s.src).slice(0, 10),
+                styles: Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(l => l.href).slice(0, 10),
+                bodyText: doc.body?.textContent.trim().substring(0, 2000) || 'No body content',
+                htmlLang: doc.documentElement.lang || 'not specified'
+            };
+            
+            return info;
+        }
+
+        // Update explanation based on mode and action
+        function updateExplanation() {
+            const box = document.getElementById('explanationBox');
+            const explanations = {
+                seo: {
+                    general: '<p><strong>General SEO Overview:</strong></p><ul><li>Comprehensive SEO analysis</li><li>Key optimization opportunities</li><li>Priority recommendations</li><li>Quick wins and long-term strategy</li></ul>',
+                    inspect: '<p><strong>SEO Element Inspector:</strong></p><ul><li>Analyze meta tags and descriptions</li><li>Check title optimization</li><li>Review header hierarchy</li><li>Evaluate content structure</li></ul>',
+                    clean: '<p><strong>CSS Cleanup for SEO:</strong></p><ul><li>Remove unused CSS</li><li>Optimize file size</li><li>Improve load times</li><li>Enhance Core Web Vitals</li></ul>',
+                    analyze: '<p><strong>Deep SEO Analysis:</strong></p><ul><li>Advanced on-page factors</li><li>Technical SEO deep dive</li><li>Content optimization strategy</li><li>Competitor-level insights</li></ul>'
+                },
+                accessibility: {
+                    general: '<p><strong>General Accessibility Check:</strong></p><ul><li>Overall WCAG compliance</li><li>Common accessibility issues</li><li>Priority fixes</li><li>User experience improvements</li></ul>',
+                    inspect: '<p><strong>Accessibility Inspection:</strong></p><ul><li>Check ARIA labels</li><li>Review semantic HTML</li><li>Test keyboard navigation</li><li>Evaluate color contrast</li></ul>',
+                    clean: '<p><strong>Accessibility CSS Review:</strong></p><ul><li>Focus states visibility</li><li>Text readability</li><li>Color contrast ratios</li><li>Responsive sizing</li></ul>',
+                    analyze: '<p><strong>WCAG Deep Dive:</strong></p><ul><li>Level A, AA, AAA standards</li><li>Screen reader compatibility</li><li>Interactive elements</li><li>Detailed compliance report</li></ul>'
+                },
+                performance: {
+                    general: '<p><strong>General Performance Check:</strong></p><ul><li>Overall site speed</li><li>Core Web Vitals overview</li><li>Quick optimization wins</li><li>Performance bottlenecks</li></ul>',
+                    inspect: '<p><strong>Performance Inspection:</strong></p><ul><li>Resource loading</li><li>Critical rendering path</li><li>JavaScript execution</li><li>Asset optimization</li></ul>',
+                    clean: '<p><strong>Performance Optimization:</strong></p><ul><li>CSS minification</li><li>Remove render-blocking CSS</li><li>Inline critical CSS</li><li>Reduce file size</li></ul>',
+                    analyze: '<p><strong>Full Performance Audit:</strong></p><ul><li>Detailed Core Web Vitals</li><li>Load time breakdown</li><li>Advanced optimizations</li><li>Performance budget</li></ul>'
+                },
+                security: {
+                    general: '<p><strong>General Security Check:</strong></p><ul><li>Common vulnerabilities</li><li>HTTPS implementation</li><li>Security best practices</li><li>Quick security wins</li></ul>',
+                    inspect: '<p><strong>Security Inspection:</strong></p><ul><li>Check for XSS vulnerabilities</li><li>Review CSP headers</li><li>Analyze form security</li><li>Inspect authentication</li></ul>',
+                    clean: '<p><strong>Security CSS Review:</strong></p><ul><li>Remove sensitive data</li><li>Check for info leakage</li><li>Review external resources</li><li>Validate safe styling</li></ul>',
+                    analyze: '<p><strong>Deep Security Audit:</strong></p><ul><li>Comprehensive vulnerability scan</li><li>Security headers analysis</li><li>Third-party risk assessment</li><li>Compliance check</li></ul>'
+                },
+                css: {
+                    general: '<p><strong>General CSS Overview:</strong></p><ul><li>CSS quality assessment</li><li>Optimization opportunities</li><li>Modern CSS features</li><li>Maintainability score</li></ul>',
+                    inspect: '<p><strong>CSS Structure Analysis:</strong></p><ul><li>Review CSS architecture</li><li>Check specificity issues</li><li>Identify unused selectors</li><li>Evaluate methodologies</li></ul>',
+                    clean: '<p><strong>CSS Optimization:</strong></p><ul><li>Remove duplicate rules</li><li>Consolidate properties</li><li>Minimize selectors</li><li>Reduce file size</li></ul>',
+                    analyze: '<p><strong>CSS Deep Dive:</strong></p><ul><li>Advanced performance impact</li><li>Browser compatibility</li><li>Architecture recommendations</li><li>Future-proofing strategy</li></ul>'
+                }
+            };
+
+            box.innerHTML = explanations[state.currentMode]?.[state.currentAction] || explanations.seo.general;
+        }
+
+        // Generate prompt based on mode and action with actual website data
+        function generatePrompt(url, mode, action, websiteInfo) {
+            const languageInstruction = getLanguageInstruction();
+            
+            const baseContext = `
+${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+HTML Language: ${websiteInfo.htmlLang}
+
+Title: ${websiteInfo.title}
+Meta Description: ${websiteInfo.metaDescription}
+
+H1 Tags (${websiteInfo.h1Tags.length}):
+${websiteInfo.h1Tags.map((h, i) => `${i + 1}. ${h}`).join('\n')}
+
+H2 Tags (showing first 10 of ${websiteInfo.h2Tags.length}):
+${websiteInfo.h2Tags.slice(0, 10).map((h, i) => `${i + 1}. ${h}`).join('\n')}
+
+Meta Tags:
+${websiteInfo.metaTags.slice(0, 15).map(m => `- ${m.name}: ${m.content}`).join('\n')}
+
+Images (showing first 10 of ${websiteInfo.images.length}):
+${websiteInfo.images.slice(0, 10).map((img, i) => `${i + 1}. ${img.src} - Alt: "${img.alt}"`).join('\n')}
+
+Links (showing first 15 of ${websiteInfo.links.length}):
+${websiteInfo.links.slice(0, 15).map((link, i) => `${i + 1}. ${link.href} - Text: "${link.text}"`).join('\n')}
+
+Page Content Preview:
+${websiteInfo.bodyText.substring(0, 1500)}...
+`;
+
+            const prompts = {
+                seo: {
+                    general: `${baseContext}
+
+Based on the ACTUAL website data above, provide a general SEO overview covering:
+1. Overall SEO health score and summary
+2. Top 5 priority improvements
+3. Quick wins that can be implemented immediately
+4. Long-term SEO strategy recommendations
+5. Key strengths to maintain`,
+                    inspect: `${baseContext}
+
+Based on the ACTUAL website data above, provide a detailed SEO element inspection. Analyze:
+1. Title tag optimization (current: "${websiteInfo.title}")
+2. Meta description quality (current: "${websiteInfo.metaDescription}")
+3. Header hierarchy and keyword usage
+4. Content structure and organization
+5. Specific recommendations for improvement`,
+                    clean: `${baseContext}
+
+Based on the ACTUAL website data above, analyze CSS from an SEO perspective:
+1. Identify potential render-blocking resources
+2. CSS optimization opportunities
+3. Impact on Core Web Vitals
+4. File size and loading performance recommendations`,
+                    analyze: `${baseContext}
+
+Based on the ACTUAL website data above, perform a deep SEO analysis covering:
+1. Advanced on-page SEO factors (title, meta, headers, content)
+2. Technical SEO deep dive (structure, links, images)
+3. Content optimization strategy with keyword opportunities
+4. Priority recommendations with implementation difficulty and impact scores`
+                },
+                accessibility: {
+                    general: `${baseContext}
+
+Based on the ACTUAL website data above, provide a general accessibility overview:
+1. Overall WCAG compliance level estimate
+2. Most critical accessibility issues
+3. Priority fixes with impact assessment
+4. User experience improvements for all users`,
+                    inspect: `${baseContext}
+
+Based on the ACTUAL website data above, inspect for accessibility issues:
+1. Image alt text quality (${websiteInfo.images.filter(img => !img.alt || img.alt === 'No alt text').length} images missing alt text)
+2. Semantic HTML structure
+3. Link accessibility and descriptive text
+4. WCAG compliance findings`,
+                    clean: `${baseContext}
+
+Based on the ACTUAL website data above, review CSS for accessibility:
+1. Text contrast and readability
+2. Focus states and keyboard navigation
+3. Responsive sizing for different devices
+4. Color contrast ratios`,
+                    analyze: `${baseContext}
+
+Based on the ACTUAL website data above, perform a deep WCAG accessibility audit:
+1. Detailed Level A, AA, AAA compliance assessment
+2. Screen reader compatibility analysis
+3. Interactive elements accessibility review
+4. Comprehensive fixes with priority levels and implementation guide`
+                },
+                performance: {
+                    general: `${baseContext}
+
+External Scripts: ${websiteInfo.scripts.length} scripts found
+External Styles: ${websiteInfo.styles.length} stylesheets found
+
+Based on the ACTUAL website data above, provide a general performance overview:
+1. Overall site speed assessment
+2. Core Web Vitals prediction
+3. Top 5 quick optimization wins
+4. Performance bottlenecks to address`,
+                    inspect: `${baseContext}
+
+External Scripts: ${websiteInfo.scripts.length} scripts found
+External Styles: ${websiteInfo.styles.length} stylesheets found
+
+Based on the ACTUAL website data above, inspect performance:
+1. Resource loading analysis
+2. Critical rendering path
+3. Script and stylesheet optimization
+4. Asset optimization opportunities`,
+                    clean: `${baseContext}
+
+Stylesheets found:
+${websiteInfo.styles.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL data above, analyze CSS performance:
+1. Render-blocking CSS identification
+2. Minification opportunities
+3. Critical CSS extraction
+4. File size reduction strategies`,
+                    analyze: `${baseContext}
+
+Based on the ACTUAL website data above, perform a comprehensive performance audit:
+1. Detailed Core Web Vitals optimization strategy
+2. Load time analysis and breakdown
+3. Resource optimization priorities
+4. Advanced performance improvements with expected impact`
+                },
+                security: {
+                    general: `${baseContext}
+
+Scripts loaded:
+${websiteInfo.scripts.slice(0, 10).map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL website data above, provide a general security overview:
+1. Common vulnerabilities check
+2. HTTPS and security headers status
+3. Top security risks
+4. Quick security improvements`,
+                    inspect: `${baseContext}
+
+Scripts loaded:
+${websiteInfo.scripts.slice(0, 10).map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL website data above, inspect for security issues:
+1. XSS vulnerability potential
+2. External resource security
+3. Form security considerations
+4. Third-party script risks`,
+                    clean: `${baseContext}
+
+Based on the ACTUAL website data above, review CSS security:
+1. Sensitive data exposure risks
+2. External resource validation
+3. CSS injection vulnerabilities
+4. Security best practices`,
+                    analyze: `${baseContext}
+
+Based on the ACTUAL website data above, perform a deep security audit:
+1. Comprehensive HTTPS implementation review
+2. Security headers analysis
+3. Third-party dependencies risk assessment
+4. Detailed security recommendations with priority levels`
+                },
+                css: {
+                    general: `${baseContext}
+
+Stylesheets:
+${websiteInfo.styles.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL website data above, provide a general CSS overview:
+1. CSS quality assessment score
+2. Main optimization opportunities
+3. Modern CSS feature usage
+4. Maintainability recommendations`,
+                    inspect: `${baseContext}
+
+Stylesheets:
+${websiteInfo.styles.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL website data above, analyze CSS architecture:
+1. CSS structure and organization
+2. Specificity and selector efficiency
+3. Methodology adherence
+4. Optimization opportunities`,
+                    clean: `${baseContext}
+
+Based on the ACTUAL website data above, optimize CSS:
+1. Duplicate rule identification
+2. Property consolidation
+3. Selector optimization
+4. File size reduction strategies`,
+                    analyze: `${baseContext}
+
+Based on the ACTUAL website data above, perform a deep CSS evaluation:
+1. Advanced browser compatibility analysis
+2. Performance impact assessment
+3. Maintainability and scalability review
+4. Modern CSS feature recommendations`
+                }
+            };
+
+            return prompts[mode]?.[action] || prompts.seo.general;
+        }
+
+        // Call Groq API
+        async function callGroqAPI(prompt) {
+            const messages = [
+                {
+                    role: 'system',
+                    content: state.systemPrompt || 'You are an expert web analyst specializing in SEO, accessibility, performance, security, and CSS optimization. Provide detailed, actionable insights with specific recommendations.'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ];
+
+            try {
+                const response = await axios.post(
+                    'https://api.groq.com/openai/v1/chat/completions',
+                    {
+                        model: state.model,
+                        messages: messages,
+                        temperature: state.temperature,
+                        max_tokens: state.maxTokens
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${state.apiKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                return response.data.choices[0].message.content;
+            } catch (error) {
+                throw new Error(`API Error: ${error.response?.data?.error?.message || error.message}`);
+            }
+        }
+
+        // Run analysis
+        document.getElementById('runAnalysis').addEventListener('click', async () => {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                showToast('Please enter a URL to analyze', 'error');
+                return;
+            }
+
+            if (!state.apiKey || !state.model) {
+                showToast('Please configure API settings first', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('runAnalysis');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div><span>Fetching website...</span>';
+
+            try {
+                const html = await fetchWebsiteContent(url);
+                btn.innerHTML = '<div class="spinner"></div><span>Analyzing content...</span>';
+                
+                const websiteInfo = extractWebsiteInfo(html, url);
+                state.websiteInfo = websiteInfo;
+                
+                state.detectedLanguage = detectLanguage(websiteInfo);
+                
+                const prompt = generatePrompt(url, state.currentMode, state.currentAction, websiteInfo);
+                const analysis = await callGroqAPI(prompt);
+                displayResults(analysis);
+                showToast('Analysis complete!');
+                
+                document.getElementById('chatCard').style.display = 'block';
+            } catch (error) {
+                displayResults(error.message, 'error');
+                showToast('Analysis failed', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀 Run Analysis</span>';
+            }
+        });
+
+        // Display results with language badge
+        function displayResults(content, type = 'success') {
+            const container = document.getElementById('resultsContainer');
+            const resultBox = document.createElement('div');
+            resultBox.className = `result-box ${type}`;
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.style.display = 'flex';
+            headerDiv.style.alignItems = 'center';
+            headerDiv.style.justifyContent = 'space-between';
+            headerDiv.style.marginBottom = '0.75rem';
+            
+            const title = document.createElement('h3');
+            title.textContent = type === 'error' ? '❌ Error' : '✅ Analysis Results';
+            title.style.margin = '0';
+            
+            const langBadge = document.createElement('span');
+            langBadge.className = 'language-badge';
+            const langNames = {
+                'sv': '🇸🇪 Svenska',
+                'en': '🇬🇧 English',
+                'no': '🇳🇴 Norsk',
+                'da': '🇩🇰 Dansk',
+                'de': '🇩🇪 Deutsch',
+                'es': '🇪🇸 Español',
+                'fr': '🇫🇷 Français'
+            };
+            const displayLang = state.selectedLanguage === 'auto' ? state.detectedLanguage : state.selectedLanguage;
+            langBadge.textContent = langNames[displayLang] || '🇬🇧 English';
+            
+            headerDiv.appendChild(title);
+            if (type !== 'error') {
+                headerDiv.appendChild(langBadge);
+            }
+            
+            const pre = document.createElement('pre');
+            pre.textContent = content;
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '📋 Copy Results';
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(content);
+                showToast('Results copied to clipboard!');
+            };
+            
+            resultBox.appendChild(headerDiv);
+            resultBox.appendChild(pre);
+            resultBox.appendChild(copyBtn);
+            
+            container.innerHTML = '';
+            container.appendChild(resultBox);
+            
+            if (type !== 'error' && state.websiteInfo) {
+                state.chatHistory.push({
+                    role: 'assistant',
+                    content: content
+                });
+            }
+        }
+
+        // Clear results
+        document.getElementById('clearResults').addEventListener('click', () => {
+            document.getElementById('resultsContainer').innerHTML = '';
+            showToast('Results cleared');
+        });
+
+        // Chat functionality
+        function addChatMessage(role, content) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+            
+            const label = document.createElement('div');
+            label.className = 'chat-message-label';
+            label.textContent = role === 'user' ? 'You' : 'AI Assistant';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'chat-message-content';
+            contentDiv.textContent = content;
+            
+            if (role === 'user') {
+                messageDiv.appendChild(contentDiv);
+            } else {
+                messageDiv.appendChild(label);
+                messageDiv.appendChild(contentDiv);
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            if (!state.apiKey || !state.model) {
+                showToast('Please configure API settings first', 'error');
+                return;
+            }
+            
+            if (!state.websiteInfo) {
+                showToast('Please run an analysis first', 'error');
+                return;
+            }
+            
+            addChatMessage('user', message);
+            state.chatHistory.push({ role: 'user', content: message });
+            input.value = '';
+            
+            const sendBtn = document.getElementById('chatSendBtn');
+            sendBtn.disabled = true;
+            
+            try {
+                const languageInstruction = getLanguageInstruction();
+                
+                const contextMessage = {
+                    role: 'system',
+                    content: `${languageInstruction}
+
+You are an expert web analyst assistant. You have access to the following website data:
+
+URL: ${state.websiteInfo.url}
+Title: ${state.websiteInfo.title}
+Meta Description: ${state.websiteInfo.metaDescription}
+H1 Tags: ${state.websiteInfo.h1Tags.join(', ')}
+Number of Images: ${state.websiteInfo.images.length}
+Images Missing Alt Text: ${state.websiteInfo.images.filter(img => !img.alt || img.alt === 'No alt text').length}
+
+Help the user with:
+- Answering questions about the previous analysis
+- Writing better meta descriptions and titles
+- Generating alt text for images
+- Creating SEO-friendly content
+- Fixing accessibility issues
+- Optimizing performance
+- Any web optimization questions
+
+Be helpful, specific, and provide actionable advice. If the user asks you to generate content (like alt text, meta descriptions, etc.), provide multiple options they can choose from.`
+                };
+                
+                const messages = [contextMessage, ...state.chatHistory.slice(-10)];
+                
+                const response = await axios.post(
+                    'https://api.groq.com/openai/v1/chat/completions',
+                    {
+                        model: state.model,
+                        messages: messages,
+                        temperature: state.temperature,
+                        max_tokens: state.maxTokens
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${state.apiKey}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+                
+                const aiResponse = response.data.choices[0].message.content;
+                addChatMessage('assistant', aiResponse);
+                state.chatHistory.push({ role: 'assistant', content: aiResponse });
+                
+            } catch (error) {
+                addChatMessage('assistant', `Error: ${error.response?.data?.error?.message || error.message}`);
+                showToast('Chat error', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        document.getElementById('clearChat').addEventListener('click', () => {
+            state.chatHistory = [];
+            document.getElementById('chatContainer').innerHTML = '';
+            showToast('Chat history cleared');
+        });
+
+        // Quick actions with real website data
+        async function quickAction(type) {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                showToast('Please enter a URL first', 'error');
+                return;
+            }
+
+            if (!state.apiKey || !state.model) {
+                showToast('Please configure API settings first', 'error');
+                return;
+            }
+
+            showToast(`Fetching website data...`);
+
+            try {
+                const html = await fetchWebsiteContent(url);
+                const websiteInfo = extractWebsiteInfo(html, url);
+                state.websiteInfo = websiteInfo;
+                state.detectedLanguage = detectLanguage(websiteInfo);
+                
+                const languageInstruction = getLanguageInstruction();
+                
+                const prompts = {
+                    meta: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+Meta Tags Found:
+${websiteInfo.metaTags.map(m => `- ${m.name}: ${m.content}`).join('\n')}
+
+Title: ${websiteInfo.title}
+Meta Description: ${websiteInfo.metaDescription}
+
+Based on the ACTUAL meta tags above, analyze and provide:
+1. Title tag optimization (is it within 50-60 characters? keyword-rich?)
+2. Meta description quality (is it within 150-160 characters? compelling?)
+3. Open Graph tags completeness
+4. Twitter Card implementation
+5. Other important meta tags (viewport, robots, etc.)
+6. Specific recommendations for improvement`,
+                    
+                    headers: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+H1 Tags Found (${websiteInfo.h1Tags.length}):
+${websiteInfo.h1Tags.map((h, i) => `${i + 1}. ${h}`).join('\n')}
+
+H2 Tags Found (${websiteInfo.h2Tags.length}):
+${websiteInfo.h2Tags.map((h, i) => `${i + 1}. ${h}`).join('\n')}
+
+Based on the ACTUAL header structure above, analyze:
+1. H1 tag usage (should be exactly 1, currently: ${websiteInfo.h1Tags.length})
+2. Header hierarchy correctness
+3. Keyword usage in headers
+4. Content structure and organization
+5. SEO optimization opportunities`,
+                    
+                    images: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+Images Found (${websiteInfo.images.length} total):
+${websiteInfo.images.map((img, i) => `${i + 1}. ${img.src}
+   Alt text: "${img.alt}"
+   Status: ${img.alt && img.alt !== 'No alt text' ? '✓ Has alt' : '✗ Missing alt'}`).join('\n\n')}
+
+Based on the ACTUAL images above, analyze:
+1. Alt text quality and descriptiveness (${websiteInfo.images.filter(img => !img.alt || img.alt === 'No alt text').length} images missing alt text)
+2. File naming conventions
+3. Image format optimization opportunities
+4. Lazy loading implementation
+5. Accessibility improvements needed`,
+                    
+                    links: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+Links Found (${websiteInfo.links.length} total, showing first 30):
+${websiteInfo.links.slice(0, 30).map((link, i) => `${i + 1}. ${link.href}
+   Anchor text: "${link.text}"
+   Type: ${link.href.startsWith(url) || link.href.startsWith('/') ? 'Internal' : 'External'}`).join('\n\n')}
+
+Based on the ACTUAL links above, analyze:
+1. Internal vs external link ratio
+2. Anchor text quality and descriptiveness
+3. Broken link potential
+4. Nofollow/noopener attributes for external links
+5. Link structure optimization`,
+                    
+                    mobile: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+Meta Tags:
+${websiteInfo.metaTags.filter(m => m.name?.includes('viewport') || m.name?.includes('mobile')).map(m => `- ${m.name}: ${m.content}`).join('\n')}
+
+Based on the ACTUAL website data, analyze mobile responsiveness:
+1. Viewport meta tag configuration
+2. Touch target sizes (buttons, links)
+3. Font sizing for mobile readability
+4. Mobile-specific CSS considerations
+5. Responsive design implementation`,
+                    
+                    schema: `${languageInstruction}
+
+WEBSITE DATA FOR: ${url}
+
+Meta Tags:
+${websiteInfo.metaTags.map(m => `- ${m.name || m.property}: ${m.content}`).join('\n')}
+
+Scripts (potential JSON-LD):
+${websiteInfo.scripts.slice(0, 10).map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+Based on the ACTUAL website data, analyze structured data:
+1. JSON-LD schema presence and validity
+2. Microdata implementation
+3. Open Graph completeness
+4. Rich snippet opportunities
+5. Specific schema recommendations for this content type`
+                };
+
+                showToast(`Analyzing ${type}...`);
+                const analysis = await callGroqAPI(prompts[type]);
+                displayResults(analysis);
+                showToast('Analysis complete!');
+                
+                document.getElementById('chatCard').style.display = 'block';
+            } catch (error) {
+                displayResults(error.message, 'error');
+                showToast('Analysis failed', 'error');
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('runAnalysis').click();
+            }
+            
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('urlInput').focus();
+            }
+            
+            if (e.key === 'Escape') {
+                const panel = document.getElementById('settingsPanel');
+                if (panel.classList.contains('active')) {
+                    document.getElementById('settingsBtn').click();
+                }
+            }
+        });
+
+        // Initialize
+        loadSettings();
+        updateExplanation();
+
+        // Auto-save settings on change
+        let saveTimeout;
+        ['apiKey', 'modelSelect', 'temperature', 'maxTokens', 'systemPrompt', 'languageSelect'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(() => {
+                        saveSettings();
+                    }, 1000);
+                });
+            }
+        });
+
+        // Add URL validation
+        document.getElementById('urlInput').addEventListener('blur', (e) => {
+            const url = e.target.value.trim();
+            if (url && !url.match(/^https?:\/\//)) {
+                e.target.value = 'https://' + url;
+            }
+        });
+
+        console.log('🎉 OctoAI Assistant loaded successfully!');
+        console.log('💡 Tip: Press Ctrl+K to focus URL input, Ctrl+Enter to run analysis');
+    </script>
+</body>
+</html>
