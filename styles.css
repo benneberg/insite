@@ -37,6 +37,7 @@ body{
   padding:2rem;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  overflow-y: auto;
   overflow-x:hidden;
   line-height:1.5;
 }
