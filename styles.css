@@ -33,7 +33,6 @@ body{
   background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   min-height: 100vh;
   height: 100dvh;
-  overflow: hidden;
   color:var(--muted);
   padding:2rem;
   -webkit-font-smoothing:antialiased;
