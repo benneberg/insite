@@ -103,6 +103,15 @@ body{
   cursor:pointer;transition:var(--micro);
   backdrop-filter: blur(6px);
 }
+.settings-btn.active {
+    background: var(--accent-grad);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 26px 26px 52px #090637, -26px -26px 52px #0d0855;
+    border-radius: 50px;
+    background: #1d6a22 !important;
+    box-shadow: 26px 26px 52px #090637, -26px -26px 52px #0d0855;
+}
 .settings-btn:hover{transform:rotate(8deg) scale(1.02);box-shadow:var(--accent-glow)}
 .settings-btn.active{background:var(--accent-grad);color:#fff;border-color:rgba(255,255,255,0.06)}
 
