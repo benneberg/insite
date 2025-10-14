@@ -5,8 +5,8 @@
   --glass: rgba(255,255,255,0.06);
   --glass-2: rgba(255,255,255,0.04);
   --glass-border: rgba(255,255,255,0.12);
-  --accent-1: #7b5cff;         /* violet */
-  --accent-2: #46c1f6;         /* cyan */
+  --accent-1: #f4ed38;         /* yellow */
+  --accent-2: #615321;         /* brown */
   --accent-grad: linear-gradient(135deg,var(--accent-1),var(--accent-2));
   --muted: rgba(226,232,240,0.75);
   --muted-2: rgba(226,232,240,0.45);
