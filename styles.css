@@ -30,10 +30,10 @@
 html,body{height:100%}
 body{
   font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
-  background:
-    radial-gradient(1200px 600px at 5% 10%, rgba(75,45,160,0.12), transparent 8%),
-    radial-gradient(800px 400px at 95% 90%, rgba(70,193,246,0.06), transparent 8%),
-    var(--bg-ink);
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   color:var(--muted);
   padding:2rem;
   -webkit-font-smoothing:antialiased;
@@ -44,12 +44,23 @@ body{
 
 /* container */
 .container{
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  z-index: 1;
   max-width:var(--max-width);
   margin:0 auto;
   display:block;
   gap:var(--ui-gap);
 }
-
+        #particleCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
 /* header */
 .header{
   display:flex;
@@ -96,16 +107,46 @@ body{
 .settings-btn.active{background:var(--accent-grad);color:#fff;border-color:rgba(255,255,255,0.06)}
 
 /* cards / panels */
-.card, .settings-panel{
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  border-radius:var(--radius-lg);
-  border:1px solid var(--glass-border);
-  padding:var(--card-padding);
-  box-shadow:var(--glass-shadow);
-  backdrop-filter: blur(var(--glass-blur)) saturate(115%);
-  transition:var(--micro);
-}
-.card + .card{margin-top:1rem}
+      /* Glassmorphism for cards */
+        .card, .settings-panel, .content {
+            background: rgba(25, 25, 45, 0.32);
+            border-radius: 24px;
+            backdrop-filter: blur(18px) saturate(120%);
+            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 1.5px rgba(255,255,255,0.09);
+            border: 1.5px solid rgba(255,255,255,0.18);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before, .settings-panel::before, .content::before {
+            content: '';
+            position: absolute;
+            top: -8px; left: -8px; right: -8px; bottom: -8px;
+            background: linear-gradient(120deg, rgba(120,180,255,0.11) 0%, rgba(180,120,255,0.09) 100%);
+            border-radius: 28px;
+            pointer-events: none;
+            filter: blur(18px);
+            opacity: 0.7;
+            z-index: 0;
+        }
+        .card, .settings-panel, .content {
+            z-index: 2;
+        }
+        /* Optionally, add a subtle border shine effect */
+        .card::after, .settings-panel::after, .content::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            border: 1.5px solid rgba(255,255,255,0.11);
+            pointer-events: none;
+            z-index: 2;
+        }
+        /* Optional: Slight text glow for glass panels */
+        .card, .settings-panel, .content {
+            color: #eaf6ff;
+            text-shadow: 0 1.5px 6px rgba(30,40,95, 0.12), 0 0.5px 0 rgba(255,255,255,0.09);
+        }
 
 /* collapsed settings */
 .settings-panel{max-height:0;opacity:0;overflow:hidden}
