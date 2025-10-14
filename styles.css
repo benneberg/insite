@@ -72,7 +72,7 @@ body{
   border:1px solid var(--glass-border);
   backdrop-filter: blur(var(--glass-blur)) saturate(120%);
   box-shadow:var(--glass-shadow);
-  margin-bottom:1.25rem;
+  margin: 2rem 0 1.25rem 0;
   transition:var(--micro);
   transform-origin:center;
 }
