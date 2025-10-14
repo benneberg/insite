@@ -128,7 +128,7 @@ body{
             transform-origin: center;
             position: relative;
             overflow: hidden;
-            padding: 1.rem;
+            padding: 1rem;
         }
         .card::before, .settings-panel::before, .content::before {
             content: '';
@@ -161,7 +161,7 @@ body{
         }
 
 /* collapsed settings */
-.settings-panel{max-height:0;opacity:0;overflow:hidden}
+.settings-panel{padding: 1rem;max-height:0;opacity:0;overflow:hidden}
 .settings-panel.active{max-height:1600px;opacity:1}
 
 /* typography helpers */
