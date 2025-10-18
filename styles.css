@@ -278,7 +278,17 @@ input[type=range]::-webkit-slider-thumb{width:16px;height:16px;border-radius:50%
   background:var(--accent-grad);color:#fff;border:1px solid rgba(255,255,255,0.04);border-bottom-right-radius:6px
 }
 .chat-message.assistant .chat-message-content{border-bottom-left-radius:6px}
-
+.chat-input-group #chat-input {
+  width: 80%;
+}
+.chat-input-group #chat-send-btn {
+    width: 10%;
+    background: none;
+    padding: .5rem;
+    border: 1px solid #ffffff85;
+    color: white;
+    border-radius: .5rem;
+}
 /* small UI helpers */
 .status-badge{display:inline-block;padding:.25rem .65rem;border-radius:999px;font-weight:700;font-size:.8rem}
 .language-badge{display:inline-block;padding:.2rem .6rem;border-radius:999px;background:rgba(123,92,255,0.07);color:var(--accent-2);font-weight:700;font-size:.78rem}
