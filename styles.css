@@ -166,6 +166,7 @@ body{
 /* collapsed settings */
 .settings-panel{padding: 1rem;max-height:0;opacity:0;overflow:hidden}
 .settings-panel.active{max-height:1600px;opacity:1}
+#modeSelect option {color: black;}
 
 /* typography helpers */
 .section-title{font-size:1.05rem;font-weight:700;color: #e6eefc;margin-bottom:.6rem}
