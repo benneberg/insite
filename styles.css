@@ -158,7 +158,11 @@ body{
             color: #eaf6ff;
             text-shadow: 0 1.5px 6px rgba(30,40,95, 0.12), 0 0.5px 0 rgba(255,255,255,0.09);
         }
-
+.explanation-box {margin: 2rem 0;}
+.explanation-box ul {margin-left: 2rem;}
+.action-tabs button {padding: .5rem 1rem;
+}
+.mode-selector {margin: 1rem 0;}
 /* collapsed settings */
 .settings-panel{padding: 1rem;max-height:0;opacity:0;overflow:hidden}
 .settings-panel.active{max-height:1600px;opacity:1}
