@@ -772,66 +772,94 @@ Based on the ACTUAL website data above, perform a deep CSS evaluation:
             }
         });
 
-        // Display results with language badge
-        function displayResults(content, type = 'success') {
-            const container = document.getElementById('resultsContainer');
-            const resultBox = document.createElement('div');
-            resultBox.className = `result-box ${type}`;
-            
-            const headerDiv = document.createElement('div');
-            headerDiv.style.display = 'flex';
-            headerDiv.style.alignItems = 'center';
-            headerDiv.style.justifyContent = 'space-between';
-            headerDiv.style.marginBottom = '0.75rem';
-            
-            const title = document.createElement('h3');
-            title.textContent = type === 'error' ? '❌ Error' : '✅ Analysis Results';
-            title.style.margin = '0';
-            
-            const langBadge = document.createElement('span');
-            langBadge.className = 'language-badge';
-            const langNames = {
-                'sv': '🇸🇪 Svenska',
-                'en': '🇬🇧 English',
-                'no': '🇳🇴 Norsk',
-                'da': '🇩🇰 Dansk',
-                'de': '🇩🇪 Deutsch',
-                'es': '🇪🇸 Español',
-                'fr': '🇫🇷 Français'
-            };
-            const displayLang = state.selectedLanguage === 'auto' ? state.detectedLanguage : state.selectedLanguage;
-            langBadge.textContent = langNames[displayLang] || '🇬🇧 English';
-            
-            headerDiv.appendChild(title);
-            if (type !== 'error') {
-                headerDiv.appendChild(langBadge);
-            }
-            
-            const pre = document.createElement('pre');
-            pre.textContent = content;
-            
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.textContent = '📋 Copy Results';
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(content);
-                showToast('Results copied to clipboard!');
-            };
-            
-            resultBox.appendChild(headerDiv);
-            resultBox.appendChild(pre);
-            resultBox.appendChild(copyBtn);
-            
-            container.innerHTML = '';
-            container.appendChild(resultBox);
-            
-            if (type !== 'error' && state.websiteInfo) {
-                state.chatHistory.push({
-                    role: 'assistant',
-                    content: content
-                });
-            }
-        }
+// Utility: Convert URLs and emails into clickable links
+function linkify(text) {
+    // Convert URLs to clickable links
+    const urlPattern = /(\bhttps?:\/\/[^\s<>]+|\bwww\.[^\s<>]+)/gi;
+    text = text.replace(urlPattern, function(url) {
+        let href = url.startsWith('http') ? url : 'http://' + url;
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+
+    // Convert emails to clickable mailto links
+    const emailPattern = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
+    text = text.replace(emailPattern, `<a href="mailto:$1">$1</a>`);
+
+    return text;
+}
+
+// Display results with language badge, Markdown, and clickable links
+function displayResults(content, type = 'success') {
+    const container = document.getElementById('resultsContainer');
+    const resultBox = document.createElement('div');
+    resultBox.className = `result-box ${type}`;
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.style.display = 'flex';
+    headerDiv.style.alignItems = 'center';
+    headerDiv.style.justifyContent = 'space-between';
+    headerDiv.style.marginBottom = '0.75rem';
+    
+    const title = document.createElement('h3');
+    title.textContent = type === 'error' ? '❌ Error' : '✅ Analysis Results';
+    title.style.margin = '0';
+    
+    const langBadge = document.createElement('span');
+    langBadge.className = 'language-badge';
+    const langNames = {
+        'sv': '🇸🇪 Svenska',
+        'en': '🇬🇧 English',
+        'no': '🇳🇴 Norsk',
+        'da': '🇩🇰 Dansk',
+        'de': '🇩🇪 Deutsch',
+        'es': '🇪🇸 Español',
+        'fr': '🇫🇷 Français'
+    };
+    const displayLang = state.selectedLanguage === 'auto' ? state.detectedLanguage : state.selectedLanguage;
+    langBadge.textContent = langNames[displayLang] || '🇬🇧 English';
+    
+    headerDiv.appendChild(title);
+    if (type !== 'error') {
+        headerDiv.appendChild(langBadge);
+    }
+
+    // --- Markdown and linkified output ---
+    const outputDiv = document.createElement('div');
+    outputDiv.className = 'ai-output';
+
+    // Parse Markdown
+    let htmlContent = marked.parse(content);
+
+    // Convert URLs and emails to clickable links
+    htmlContent = linkify(htmlContent);
+
+    outputDiv.innerHTML = htmlContent;
+
+    // Copy button
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = '📋 Copy Results';
+    copyBtn.onclick = () => {
+        navigator.clipboard.writeText(content);
+        showToast('Results copied to clipboard!');
+    };
+    
+    // Assemble
+    resultBox.appendChild(headerDiv);
+    resultBox.appendChild(outputDiv);
+    resultBox.appendChild(copyBtn);
+    
+    container.innerHTML = '';
+    container.appendChild(resultBox);
+    
+    if (type !== 'error' && state.websiteInfo) {
+        state.chatHistory.push({
+            role: 'assistant',
+            content: content
+        });
+    }
+}
+
 
         // Clear results
         document.getElementById('clearResults').addEventListener('click', () => {
