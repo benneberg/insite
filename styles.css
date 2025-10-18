@@ -26,12 +26,10 @@
 
 /* base */
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
 body{
   font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
   background: #154d59;
   min-height: 100vh;
-  height: 100dvh;
   color:var(--muted);
   padding:2rem;
   -webkit-font-smoothing:antialiased;
