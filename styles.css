@@ -253,7 +253,7 @@ input[type=range]::-webkit-slider-thumb{width:16px;height:16px;border-radius:50%
     word-break: break-word; /* prevent long URLs from breaking layout */
 }
 .ai-output h1 {font-size: 1rem;}
-
+.ai-output hr {margin: 1rem 0;}
 .result-box{
   background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border-left:4px solid var(--success);padding:1rem;border-radius:10px;color:var(--muted-2);
